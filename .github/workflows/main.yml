@@ -1,3 +1,13 @@
+name: CI Pipeline 
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -5,15 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # 其他的步骤...
-
       - name: SonarCloud analysis
         uses: sonarsource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动生成的令牌，用于授权操作
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # 您在 SonarCloud 注册时获得的令牌
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          projectBaseDir: .   # 项目的根目录
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=300sky_300sky
             -Dsonar.organization=300sky
