@@ -1,41 +1,29 @@
-name: Python application CI/CD
+name: 自动化 CI/CD 流程
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
+  build-and-push-images:
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+      - name: 检出代码
+        uses: actions/checkout@v2
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
+      - name: 登录 Docker Hub
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: 构建并推送应用镜像
+        uses: docker/build-push-action@v2
+        with:
+          context: ./app
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
-    - name: Test with pytest
-      run: |
-        pytest
-
-    - name: Build Docker image
-      run: docker build -t yunzeshi123/machine_learning1:${{ github.sha }} .
-
-    - name: Log in to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Push Docker image
-      run: docker push yunzeshi123/http:${{ github.sha }}
+      - name: 构建并推送数据库镜像
+        uses: docker/build-push-action@v2
+        with:
+          context: ./db
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mydb:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
