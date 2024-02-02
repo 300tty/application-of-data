@@ -12,14 +12,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 登录 Docker Hub
-        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
 
       - name: 构建并推送应用镜像
         uses: docker/build-push-action@v2
         with:
           context: ./app
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: 构建并推送数据库镜像
