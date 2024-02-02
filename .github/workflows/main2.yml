@@ -1,4 +1,4 @@
-name: 自动化 CI/CD 流程
+name: Automate your CI/CD process
 
 on:
   push:
@@ -8,23 +8,23 @@ jobs:
   build-and-push-images:
     runs-on: ubuntu-22.04
     steps:
-      - name: 检出代码
+      - name: Check out code
         uses: actions/checkout@v2
 
-      - name: 登录 Docker Hub
+      - name: Log in to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
 
-      - name: 构建并推送应用镜像
+      - name: Build and push application images
         uses: docker/build-push-action@v2
         with:
           context: ./app
           tags: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: 构建并推送数据库镜像
+      - name: Build and push the database image
         uses: docker/build-push-action@v2
         with:
           context: ./db
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mydb:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/mydb:latest
           push: ${{ github.ref == 'refs/heads/main' }}
